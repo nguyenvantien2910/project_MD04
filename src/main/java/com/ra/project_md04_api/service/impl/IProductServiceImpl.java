@@ -1,8 +1,8 @@
 package com.ra.project_md04_api.service.impl;
 
+import com.ra.project_md04_api.model.dto.request.FormAddProduct;
 import com.ra.project_md04_api.model.entity.Category;
 import com.ra.project_md04_api.model.entity.Product;
-import com.ra.project_md04_api.repository.ICategoryRepository;
 import com.ra.project_md04_api.repository.IProductRepository;
 import com.ra.project_md04_api.service.ICategoryService;
 import com.ra.project_md04_api.service.IProductService;
@@ -15,7 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,13 +32,32 @@ public class IProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Product addProduct(Product product) {
+    public Product addProduct(FormAddProduct formAddProduct) {
+        Product product = Product.builder()
+                .productName(formAddProduct.getProductName())
+                .sku(UUID.randomUUID().toString())
+                .image(formAddProduct.getImage())
+                .description(formAddProduct.getDescription())
+                .stockQuantity(formAddProduct.getStockQuantity())
+                .unitPrice(formAddProduct.getUnitPrice())
+                .category(categoryService.getCategoryById(formAddProduct.getCategoryId()))
+                .createdAt(new Date())
+                .updateAt(null)
+                .build();
         return productRepository.save(product);
     }
 
     @Override
-    public Product updateProduct(Product product) {
-        productRepository.findById(product.getProductId()).orElseThrow(() -> new RuntimeException("Product not found" + product.getProductName()));
+    public Product updateProduct(FormAddProduct formAddProduct,Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found" + productId));
+
+        product.setProductName(formAddProduct.getProductName());
+        product.setDescription(formAddProduct.getDescription());
+        product.setStockQuantity(formAddProduct.getStockQuantity());
+        product.setUnitPrice(formAddProduct.getUnitPrice());
+        product.setCategory(categoryService.getCategoryById(formAddProduct.getCategoryId()));
+        product.setUpdateAt(new Date());
+
         return productRepository.save(product);
     }
 
@@ -93,8 +114,36 @@ public class IProductServiceImpl implements IProductService {
             log.error("Category not found by categoryId: {}", categoryId);
             return Collections.emptyList();
         } else {
-            return productRepository.findProductByCategoryCategoryId(categoryId);
+            if (!category.getStatus()) {
+                log.error("Category status is not correct");
+            } else {
+                return productRepository.findProductByCategoryCategoryId(categoryId);
+            }
         }
+        return Collections.emptyList();
     }
 
+    @Override
+    public Page<Product> getProductsIsSalePaging(Integer page, Integer perPage, String orderBy, String direction) {
+        Pageable pageable = null;
+
+        if (orderBy != null && !orderBy.isEmpty()) {
+            // co sap xep
+            Sort sort = null;
+            switch (direction) {
+                case "ASC":
+                    sort = Sort.by(orderBy).ascending();
+                    break;
+                case "DESC":
+                    sort = Sort.by(orderBy).descending();
+                    break;
+            }
+            pageable = PageRequest.of(page, perPage, sort);
+        } else {
+            //khong sap xep
+            pageable = PageRequest.of(page, perPage);
+        }
+
+        return productRepository.findProductsIsSaleAndSorting(pageable);
+    }
 }

@@ -1,13 +1,19 @@
 package com.ra.project_md04_api.service.impl;
 
+import com.ra.project_md04_api.model.dto.request.FormUpdateUserInfo;
+import com.ra.project_md04_api.model.dto.request.FormChangePassword;
+import com.ra.project_md04_api.model.dto.response.UserInfoResponse;
 import com.ra.project_md04_api.model.entity.Role;
 import com.ra.project_md04_api.model.entity.User;
 import com.ra.project_md04_api.repository.IRoleRepository;
 import com.ra.project_md04_api.repository.IUserRepository;
+import com.ra.project_md04_api.security.principals.CustomUserDetail;
 import com.ra.project_md04_api.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -90,4 +96,56 @@ public class IUserServiceImpl implements IUserService {
         return usersFilteredBySearchName;
     }
 
+    @Override
+    public Long getCurrentUserId() {
+        CustomUserDetail customUserDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return customUserDetail.getUserId();
+    }
+
+    @Override
+    public UserInfoResponse getUserInfo(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        return UserInfoResponse.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .phone(user.getPhone())
+                .email(user.getEmail())
+                .address(user.getAddress())
+                .avatar(user.getAvatar())
+                .build();
+    }
+
+    @Override
+    public User updateUserInfo(FormUpdateUserInfo formUpdateUserInfo) {
+        //Lay user tuong ung tu DB
+        User oldUser = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new RuntimeException("User not found with ID: " + getCurrentUserId()));
+
+        //gan gia tri thay doi
+        oldUser.setUsername(formUpdateUserInfo.getUsername());
+        oldUser.setFullName(formUpdateUserInfo.getFullName());
+        oldUser.setPhone(formUpdateUserInfo.getPhone());
+        oldUser.setEmail(formUpdateUserInfo.getEmail());
+        oldUser.setAddress(formUpdateUserInfo.getAddress());
+        oldUser.setAvatar(formUpdateUserInfo.getAvatar());
+
+        //lưu lại vào db
+        return userRepository.save(oldUser);
+    }
+
+    @Override
+    public User updatePassword(FormChangePassword formChangePassword) {
+        User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new RuntimeException("User not found with ID: " + getCurrentUserId()));
+
+        // check xem PW cũ nhap co dung khong
+        boolean passwordIsMatch = BCrypt.checkpw(formChangePassword.getOldPassword(), user.getPassword());
+        if (passwordIsMatch) {
+            user.setPassword(formChangePassword.getNewPassword());
+            userRepository.save(user);
+        } else {
+            log.error("Old password does not match!");
+        }
+        return null;
+    }
 }

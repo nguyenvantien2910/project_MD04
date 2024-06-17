@@ -3,7 +3,6 @@ package com.ra.project_md04_api.validator;
 import com.ra.project_md04_api.repository.IUserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

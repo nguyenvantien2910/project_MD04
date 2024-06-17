@@ -1,6 +1,8 @@
 package com.ra.project_md04_api.service;
 
-import com.ra.project_md04_api.model.entity.Role;
+import com.ra.project_md04_api.model.dto.request.FormUpdateUserInfo;
+import com.ra.project_md04_api.model.dto.request.FormChangePassword;
+import com.ra.project_md04_api.model.dto.response.UserInfoResponse;
 import com.ra.project_md04_api.model.entity.User;
 import org.springframework.data.domain.Page;
 
@@ -12,4 +14,8 @@ public interface IUserService {
     User deleteRoleFromUser(Long userId, Long roleId);
     Boolean updateUserStatus(Long userId);
     List<User> findUserByFullName(String searchName);
+    Long getCurrentUserId();
+    UserInfoResponse getUserInfo(Long userId);
+    User updateUserInfo(FormUpdateUserInfo formUpdateUserInfo);
+    User updatePassword(FormChangePassword formChangePassword);
 }

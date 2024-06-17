@@ -1,5 +1,7 @@
 package com.ra.project_md04_api.controller.admin;
 
+import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
 import com.ra.project_md04_api.model.entity.User;
 import com.ra.project_md04_api.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -17,27 +19,57 @@ public class UserController {
     private final IUserService userService;
 
     @GetMapping
-    public ResponseEntity<Page<User>> getUsers(@RequestBody String searchName, Integer page, Integer perPage, String orderBy, String direction) {
-        return new ResponseEntity<>(userService.getUserPaging(searchName, page, perPage, orderBy, direction), HttpStatus.OK);
+    public ResponseEntity<?> getUsers(@RequestBody String searchName, Integer page, Integer perPage, String orderBy, String direction) {
+        return new ResponseEntity<>(
+                ResponseWrapper.builder()
+                        .eHttpStatus(EHttpStatus.SUCCESS)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(userService.getUserPaging(searchName, page, perPage, orderBy, direction))
+                        .build()
+                , HttpStatus.OK);
     }
 
     @PutMapping("/{userId}/role/{roleId}")
-    public ResponseEntity<User> updateUserRole(@PathVariable Long userId, @PathVariable Long roleId) {
-        return new ResponseEntity<>(userService.updateRoleToUser(userId,roleId), HttpStatus.OK);
+    public ResponseEntity<?> updateUserRole(@PathVariable Long userId, @PathVariable Long roleId) {
+        return new ResponseEntity<>(
+                ResponseWrapper.builder()
+                        .eHttpStatus(EHttpStatus.SUCCESS)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(userService.updateRoleToUser(userId, roleId))
+                        .build()
+                , HttpStatus.OK);
     }
 
     @DeleteMapping("/{userId}/role/{roleId}")
-    public ResponseEntity<User> deleteUserRole(@PathVariable Long userId, @PathVariable Long roleId) {
-        return new ResponseEntity<>(userService.deleteRoleFromUser(userId,roleId), HttpStatus.OK);
+    public ResponseEntity<?> deleteUserRole(@PathVariable Long userId, @PathVariable Long roleId) {
+        return new ResponseEntity<>(
+                ResponseWrapper.builder()
+                        .eHttpStatus(EHttpStatus.SUCCESS)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(userService.deleteRoleFromUser(userId, roleId))
+                        .build()
+                , HttpStatus.OK);
     }
 
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUserStatus(@PathVariable Long userId) {
-        return new ResponseEntity<>(userService.updateUserStatus(userId), HttpStatus.OK);
+        return new ResponseEntity<>(
+                ResponseWrapper.builder()
+                        .eHttpStatus(EHttpStatus.SUCCESS)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(userService.updateUserStatus(userId))
+                        .build()
+                , HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<User>> searchUserByFullName(@RequestBody String searchName) {
-        return new ResponseEntity<>(userService.findUserByFullName(searchName), HttpStatus.OK);
+    public ResponseEntity<?> searchUserByFullName(@RequestBody String searchName) {
+        return new ResponseEntity<>(
+                ResponseWrapper.builder()
+                        .eHttpStatus(EHttpStatus.SUCCESS)
+                        .statusCode(HttpStatus.OK.value())
+                        .data(userService.findUserByFullName(searchName))
+                        .build()
+                , HttpStatus.OK);
     }
 }

@@ -24,6 +24,7 @@ public class CustomUserDetailService implements UserDetailsService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             return CustomUserDetail.builder()
+                    .userId(user.getUserId())
                     .username(user.getUsername())
                     .password(user.getPassword())
                     .fullName(user.getFullName())

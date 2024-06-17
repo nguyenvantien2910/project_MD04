@@ -19,16 +19,17 @@ import java.util.Date;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column( name = "order_id",unique = true, nullable = false)
+    @Column(name = "order_id", unique = true, nullable = false)
     private Long orderId;
 
-    @Column(nullable = false,length = 100)
-    @Max(value = 100,message = "Max lenght of serial number is 100 characters!")
+    @Column(nullable = false, length = 100)
+    @Max(value = 100, message = "Max lenght of serial number is 100 characters!")
     private String serialNumber;
 
     @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
+
     @Column(name = "total_price")
     private Double totalPrice;
 

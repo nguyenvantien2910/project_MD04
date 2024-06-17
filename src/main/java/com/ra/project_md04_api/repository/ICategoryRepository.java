@@ -9,5 +9,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface ICategoryRepository extends JpaRepository<Category, Long>, PagingAndSortingRepository<Category, Long> {
     @Query("select c from Category c where c.categoryName like concat('%',:categoryName,'%') and c.status = true ")
-    Page<Category> findCategoryByCategoryNameAndSorting (String categoryName, Pageable pageable);
+    Page<Category> findCategoryByCategoryNameAndSorting(String categoryName, Pageable pageable);
 }

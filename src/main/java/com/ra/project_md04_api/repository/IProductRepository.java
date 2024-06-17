@@ -20,4 +20,9 @@ public interface IProductRepository extends JpaRepository<Product, Long> {
 
     @Query("select p from Product p where p.category.categoryId = :categoryId")
     List<Product> findProductByCategoryCategoryId(Long categoryId);
+
+    @Query("select OD.product from order_details OD")
+    Page<Product> findProductsIsSaleAndSorting (Pageable pageable);
+
+
 }
