@@ -50,7 +50,7 @@ public class Order {
     private String receiveAddress;
 
     @Column(name = "receive_phone")
-    @Size(max = 15, message = "Max charactor is 15 !")
+    @Size(max = 15, message = "Max character is 15 !")
     private String receivePhone;
 
     @Column(name = "created_at")

@@ -6,6 +6,7 @@ import com.ra.project_md04_api.repository.IUserRepository;
 import com.ra.project_md04_api.service.IAddressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -27,6 +28,7 @@ public class IAddressServiceImpl implements IAddressService {
     }
 
     @Override
+    @Transactional
     public void deleteAddress(Long addressId) {
         addressRepository.delete(addressRepository.findByAddressId(addressId).orElseThrow(() -> new NoSuchElementException("Invalid addressId: " + addressId)));
     }

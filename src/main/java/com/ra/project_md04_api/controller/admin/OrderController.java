@@ -43,7 +43,7 @@ public class OrderController {
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
                         .statusCode(HttpStatus.OK.value())
-                        .data(orderService.getOrderById(orderId))
+                        .data(orderService.getOrderDetailByOrderId(orderId))
                         .build()
                 , HttpStatus.OK);
     }

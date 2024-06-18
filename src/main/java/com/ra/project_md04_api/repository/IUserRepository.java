@@ -10,9 +10,12 @@ import java.util.Optional;
 
 public interface IUserRepository extends JpaRepository<User, Long> {
     Boolean existsByPhone(String phone);
+
     Boolean existsByUsername(String username);
+
+    @Query("select u from User u where u.username = :userName")
     Optional<User> findUserByUsername(String userName);
 
     @Query("select u from User u where u.fullName like concat('%',:searchName,'%')")
-    Page<User> findUserByUsernameAndSorting (String searchName, Pageable pageable);
+    Page<User> findUserByUsernameAndSorting(String searchName, Pageable pageable);
 }

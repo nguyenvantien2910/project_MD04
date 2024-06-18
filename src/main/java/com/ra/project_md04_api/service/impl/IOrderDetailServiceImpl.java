@@ -19,16 +19,27 @@ public class IOrderDetailServiceImpl implements IOrderDetailService {
 
     @Override
     public List<OrderDetail> getALlOrderDetailsBySerialNumber(String serialNumber) {
-        Order order = orderRepository.findBySerialNumber(serialNumber);
-        if (order == null) {
+        Long orderId = orderRepository.findBySerialNumber(serialNumber).getOrderId();
+        if (orderId == null) {
             throw new NoSuchElementException("Serial number don't exist");
         } else {
-            List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderId(order.getOrderId());
+            List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderId(orderId);
             if (orderDetails.isEmpty()) {
                 throw new NoSuchElementException("Don't have any order detail by serial number: " + serialNumber);
             } else {
                 return orderDetails;
             }
+        }
+    }
+
+    @Override
+    public List<OrderDetail> getALlOrderDetailsByOrderId(Long orderId) {
+        orderRepository.findById(orderId).orElseThrow(() -> new NoSuchElementException("Order id don't exist" + orderId));
+        List<OrderDetail> orderDetails = orderDetailRepository.findAllByOrderId(orderId);
+        if (orderDetails.isEmpty()) {
+            throw new NoSuchElementException("Don't have any order detail by order id: " + orderId);
+        } else {
+            return orderDetails;
         }
     }
 }

@@ -1,9 +1,12 @@
 package com.ra.project_md04_api.service.impl;
 
 import com.ra.project_md04_api.model.dto.request.FormAddProduct;
-import com.ra.project_md04_api.model.entity.Category;
-import com.ra.project_md04_api.model.entity.Product;
+import com.ra.project_md04_api.model.dto.request.RevenueRequest;
+import com.ra.project_md04_api.model.entity.*;
+import com.ra.project_md04_api.repository.IOrderDetailRepository;
+import com.ra.project_md04_api.repository.IOrderRepository;
 import com.ra.project_md04_api.repository.IProductRepository;
+import com.ra.project_md04_api.repository.IWishListRepository;
 import com.ra.project_md04_api.service.ICategoryService;
 import com.ra.project_md04_api.service.IProductService;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,9 @@ import java.util.UUID;
 public class IProductServiceImpl implements IProductService {
     private final IProductRepository productRepository;
     private final ICategoryService categoryService;
+    private final IOrderDetailRepository orderDetailRepository;
+    private final IOrderRepository orderRepository;
+    private final IWishListRepository wishListRepository;
 
     @Override
     public Product getProductById(Long proId) {
@@ -48,7 +52,7 @@ public class IProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Product updateProduct(FormAddProduct formAddProduct,Long productId) {
+    public Product updateProduct(FormAddProduct formAddProduct, Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found" + productId));
 
         product.setProductName(formAddProduct.getProductName());
@@ -145,5 +149,81 @@ public class IProductServiceImpl implements IProductService {
         }
 
         return productRepository.findProductsIsSaleAndSorting(pageable);
+    }
+
+    @Override
+    public List<Product> getNewProduct() {
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
+            throw new NoSuchElementException("Product data is empty");
+        }
+        Comparator<Product> byCreatedAtDesc = Comparator.comparing(Product::getCreatedAt).reversed();
+        return products
+                .stream()
+                .sorted(byCreatedAtDesc)
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Product> getBestSellerProducts() {
+        //lay tat ca order detail
+        List<OrderDetail> orderDetails = orderDetailRepository.findAll();
+
+        // dem so luong ban
+        Map<Product, Integer> productSalesMap = orderDetails.stream()
+                .collect(Collectors.groupingBy(OrderDetail::getProduct,
+                        Collectors.summingInt(OrderDetail::getOrderQuantity)));
+
+        // sap xep lai theo so luong ban
+        return productSalesMap.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(10)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Product> getFeaturedProducts() {
+        //lay tat ca
+        List<WishList> wishLists = wishListRepository.findAll();
+
+        // dem so luong yeu thich
+        Map<Product, Long> featuredProductsMap = wishLists.stream()
+                .collect(Collectors.groupingBy(WishList::getProduct, Collectors.counting()));
+
+        // sap xep lai theo so luong yeu thich
+        return featuredProductsMap.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(10)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<Product> getBestSellerProductsFromAndTo(RevenueRequest revenueRequest) {
+        //lay order theo khoang thoi gian
+        List<Order> orders = orderRepository.findAllByCreatedAtBetween(revenueRequest.getFrom(), revenueRequest.getTo());
+
+        if (orders.isEmpty()) {
+            throw new NoSuchElementException("No orders found within the specified time range");
+        } else {
+            //lay ra danh sach Order Detail cua Order
+            List<OrderDetail> orderDetails = orders.stream()
+                    .flatMap(order -> orderDetailRepository.findAllByOrderId(order.getOrderId()).stream())
+                    .toList();
+
+            //dem do luong da ban cua tung product
+            Map<Product, Long> productSalesMap = orderDetails.stream()
+                    .collect(Collectors.groupingBy(OrderDetail::getProduct, Collectors.summingLong(OrderDetail::getOrderQuantity)));
+
+            // sap xep lai theo so luong ban
+            return productSalesMap.entrySet().stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .limit(10)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        }
     }
 }

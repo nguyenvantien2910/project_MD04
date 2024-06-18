@@ -1,6 +1,7 @@
 package com.ra.project_md04_api.service;
 
 import com.ra.project_md04_api.model.dto.request.FormAddProduct;
+import com.ra.project_md04_api.model.dto.request.RevenueRequest;
 import com.ra.project_md04_api.model.entity.Product;
 import org.springframework.data.domain.Page;
 
@@ -15,4 +16,8 @@ public interface IProductService {
     List<Product> findProductByProductNameAndDescription(String keyword);
     List<Product> findProductByCategoryCategoryId(Long categoryId);
     Page<Product> getProductsIsSalePaging(Integer page, Integer perPage, String orderBy, String direction);
+    List<Product> getNewProduct();
+    List<Product> getBestSellerProducts();
+    List<Product> getFeaturedProducts();
+    List<Product> getBestSellerProductsFromAndTo(RevenueRequest revenueRequest);
 }

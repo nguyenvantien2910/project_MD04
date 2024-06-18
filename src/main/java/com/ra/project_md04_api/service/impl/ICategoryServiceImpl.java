@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,17 +28,20 @@ public class ICategoryServiceImpl implements ICategoryService {
     }
 
     @Override
+    @Transactional
     public Category addCategory(Category category) {
         return categoryRepository.save(category);
     }
 
     @Override
+    @Transactional
     public Category updateCategory(Category category) {
         categoryRepository.findById(category.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found" + category.getCategoryName()));
         return categoryRepository.save(category);
     }
 
     @Override
+    @Transactional
     public void deleteCategory(Long cateId) {
         categoryRepository.findById(cateId).orElseThrow(() -> new RuntimeException("Category not found" + cateId));
         if (productRepository.findAll().stream().anyMatch(product -> product.getCategory().getCategoryId().equals(cateId))) {

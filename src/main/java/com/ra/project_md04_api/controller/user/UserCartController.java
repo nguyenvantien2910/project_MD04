@@ -2,9 +2,11 @@ package com.ra.project_md04_api.controller.user;
 
 import com.ra.project_md04_api.constants.EHttpStatus;
 import com.ra.project_md04_api.model.dto.request.FormAddShoppingCart;
+import com.ra.project_md04_api.model.dto.request.FormCheckout;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
 import com.ra.project_md04_api.service.IShoppingCartService;
 import com.ra.project_md04_api.service.IUserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,5 +78,29 @@ public class UserCartController {
                         .build(),
                 HttpStatus.OK
         );
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> checkout(@Valid @RequestBody FormCheckout formCheckout) {
+        boolean isCheckOutSuccess = shoppingCartService.checkoutCartItem(formCheckout);
+        if (isCheckOutSuccess) {
+            return new ResponseEntity<>(
+                    ResponseWrapper.builder()
+                            .eHttpStatus(EHttpStatus.SUCCESS)
+                            .statusCode(HttpStatus.OK.value())
+                            .data("Checkout successfully!")
+                            .build(),
+                    HttpStatus.OK
+            );
+        } else {
+            return new ResponseEntity<>(
+                    ResponseWrapper.builder()
+                            .eHttpStatus(EHttpStatus.SUCCESS)
+                            .statusCode(HttpStatus.OK.value())
+                            .data("Checkout failed!")
+                            .build(),
+                    HttpStatus.OK
+            );
+        }
     }
 }
