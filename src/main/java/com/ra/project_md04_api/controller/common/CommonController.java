@@ -1,18 +1,14 @@
 package com.ra.project_md04_api.controller.common;
 
 import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.exception.CustomException;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
-import com.ra.project_md04_api.model.entity.Category;
-import com.ra.project_md04_api.model.entity.Product;
 import com.ra.project_md04_api.service.ICategoryService;
 import com.ra.project_md04_api.service.IProductService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api.myservice.com/v1")
@@ -33,7 +29,7 @@ public class CommonController {
     }
 
     @GetMapping("/products/search")
-    public ResponseEntity<?> findProductByKeyword(@RequestBody String keyword) {
+    public ResponseEntity<?> findProductByKeyword(@RequestParam String keyword) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -44,7 +40,7 @@ public class CommonController {
     }
 
     @GetMapping("/products/{productId}")
-    public ResponseEntity<?> findProductById(@PathVariable Long productId) {
+    public ResponseEntity<?> findProductById(@PathVariable Long productId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -55,7 +51,7 @@ public class CommonController {
     }
 
     @GetMapping("/products/categories/{categoryId}")
-    public ResponseEntity<?> getProductByCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<?> getProductByCategory(@PathVariable Long categoryId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -66,7 +62,7 @@ public class CommonController {
     }
 
     @GetMapping("/products")
-    public ResponseEntity<?> getAllProductsIsSale(@RequestBody Integer page, Integer perPage, String orderBy, String direction) {
+    public ResponseEntity<?> getAllProductsIsSale(@RequestParam Integer page, Integer perPage, String orderBy, String direction) {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)

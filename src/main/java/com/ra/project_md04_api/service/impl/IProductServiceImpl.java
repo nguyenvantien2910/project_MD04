@@ -1,7 +1,10 @@
 package com.ra.project_md04_api.service.impl;
 
+import com.ra.project_md04_api.constants.OrderStatus;
+import com.ra.project_md04_api.exception.CustomException;
 import com.ra.project_md04_api.model.dto.request.FormAddProduct;
 import com.ra.project_md04_api.model.dto.request.RevenueRequest;
+import com.ra.project_md04_api.model.dto.response.FeaturedProductsResponse;
 import com.ra.project_md04_api.model.entity.*;
 import com.ra.project_md04_api.repository.IOrderDetailRepository;
 import com.ra.project_md04_api.repository.IOrderRepository;
@@ -15,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,12 +35,13 @@ public class IProductServiceImpl implements IProductService {
     private final IWishListRepository wishListRepository;
 
     @Override
-    public Product getProductById(Long proId) {
-        return productRepository.findById(proId).orElseThrow(() -> new RuntimeException("Product not found" + proId));
+    public Product getProductById(Long proId) throws CustomException {
+        return productRepository.findById(proId)
+                .orElseThrow(() -> new CustomException("Product not found with id: " + proId, HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public Product addProduct(FormAddProduct formAddProduct) {
+    public Product addProduct(FormAddProduct formAddProduct) throws CustomException {
         Product product = Product.builder()
                 .productName(formAddProduct.getProductName())
                 .sku(UUID.randomUUID().toString())
@@ -48,27 +53,49 @@ public class IProductServiceImpl implements IProductService {
                 .createdAt(new Date())
                 .updateAt(null)
                 .build();
-        return productRepository.save(product);
+        try {
+            return productRepository.save(product);
+        } catch (Exception e) {
+            throw new CustomException(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @Override
-    public Product updateProduct(FormAddProduct formAddProduct, Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new RuntimeException("Product not found" + productId));
+    public Product updateProduct(FormAddProduct formAddProduct, Long productId) throws CustomException {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new CustomException("Product not found" + productId, HttpStatus.NOT_FOUND));
 
+        boolean isNameExist = productRepository.findAll().stream().anyMatch(p -> p.getProductName().equals(formAddProduct.getProductName()));
+
+        if (isNameExist) {
+            throw new CustomException("Product name already exist", HttpStatus.CONFLICT);
+        }
+
+        Category category = categoryService.getCategoryById(formAddProduct.getCategoryId());
+        product.setProductId(productId);
         product.setProductName(formAddProduct.getProductName());
         product.setDescription(formAddProduct.getDescription());
         product.setStockQuantity(formAddProduct.getStockQuantity());
         product.setUnitPrice(formAddProduct.getUnitPrice());
-        product.setCategory(categoryService.getCategoryById(formAddProduct.getCategoryId()));
+        product.setCategory(category);
         product.setUpdateAt(new Date());
 
-        return productRepository.save(product);
+        try {
+            return productRepository.save(product);
+        } catch (Exception e) {
+            throw new CustomException(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @Override
-    public void deleteProduct(Long proId) {
-        productRepository.findById(proId).orElseThrow(() -> new RuntimeException("Product not found" + proId));
-        productRepository.deleteById(proId);
+    public void deleteProduct(Long proId) throws CustomException {
+        productRepository.findById(proId)
+                .orElseThrow(() -> new CustomException("Product not found: " + proId, HttpStatus.NOT_FOUND));
+        try {
+            productRepository.deleteById(proId);
+        } catch (Exception e) {
+            throw new CustomException(e.getMessage(), HttpStatus.CONFLICT);
+        }
     }
 
     @Override
@@ -103,28 +130,26 @@ public class IProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<Product> findProductByProductNameAndDescription(String keyword) {
-        List<Product> products = productRepository.findProductByProductNameAndDescription(keyword);
-        if (products.isEmpty()) {
-            log.error("Product not found by keyword: {}", keyword);
+    public List<Product> findProductByProductNameAndDescription(String keyword) throws CustomException {
+        try {
+            return productRepository.findProductByProductNameAndDescription(keyword);
+        } catch (NullPointerException e) {
+            throw new CustomException("Product not found by keyword: " + keyword, HttpStatus.NOT_FOUND);
         }
-        return products;
     }
 
     @Override
-    public List<Product> findProductByCategoryCategoryId(Long categoryId) {
+    public List<Product> findProductByCategoryCategoryId(Long categoryId) throws CustomException {
         Category category = categoryService.getCategoryById(categoryId);
         if (category == null) {
-            log.error("Category not found by categoryId: {}", categoryId);
-            return Collections.emptyList();
+            throw new CustomException("Category not found by categoryId:  {}" + categoryId, HttpStatus.NOT_FOUND);
         } else {
             if (!category.getStatus()) {
-                log.error("Category status is not correct");
+                throw new CustomException("Category status is not correct", HttpStatus.BAD_REQUEST);
             } else {
                 return productRepository.findProductByCategoryCategoryId(categoryId);
             }
         }
-        return Collections.emptyList();
     }
 
     @Override
@@ -152,10 +177,12 @@ public class IProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<Product> getNewProduct() {
-        List<Product> products = productRepository.findAll();
-        if (products.isEmpty()) {
-            throw new NoSuchElementException("Product data is empty");
+    public List<Product> getNewProduct() throws CustomException {
+        List<Product> products;
+        try {
+            products = productRepository.findAll();
+        } catch (NullPointerException e) {
+            throw new CustomException("Product data is empty", HttpStatus.NOT_FOUND);
         }
         Comparator<Product> byCreatedAtDesc = Comparator.comparing(Product::getCreatedAt).reversed();
         return products
@@ -166,9 +193,23 @@ public class IProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<Product> getBestSellerProducts() {
+    public List<Product> getBestSellerProducts() throws CustomException {
+        //Lay tat ca order da thanh cong
+        List<Order> successfulOrders;
+        try {
+            successfulOrders = orderRepository.findAll()
+                    .stream()
+                    .filter(order -> order.getOrderStatus().equals(OrderStatus.SUCCESS))
+                    .toList();
+        } catch (NullPointerException e) {
+            throw new CustomException("No such successful order!", HttpStatus.NOT_FOUND);
+        }
+
         //lay tat ca order detail
-        List<OrderDetail> orderDetails = orderDetailRepository.findAll();
+        List<OrderDetail> orderDetails = successfulOrders.stream()
+                .flatMap(order -> orderDetailRepository.findAllByOrderId(order.getOrderId())
+                        .stream())
+                .toList();
 
         // dem so luong ban
         Map<Product, Integer> productSalesMap = orderDetails.stream()
@@ -184,30 +225,58 @@ public class IProductServiceImpl implements IProductService {
     }
 
     @Override
-    public List<Product> getFeaturedProducts() {
+    public List<FeaturedProductsResponse> getFeaturedProducts() throws CustomException {
         //lay tat ca
-        List<WishList> wishLists = wishListRepository.findAll();
+        List<WishList> wishLists;
+        try {
+            wishLists = wishListRepository.findAll();
+        } catch (NullPointerException e) {
+            throw new CustomException("No such wish list!", HttpStatus.NOT_FOUND);
+        }
 
         // dem so luong yeu thich
         Map<Product, Long> featuredProductsMap = wishLists.stream()
                 .collect(Collectors.groupingBy(WishList::getProduct, Collectors.counting()));
 
         // sap xep lai theo so luong yeu thich
-        return featuredProductsMap.entrySet().stream()
+        List<Product> featuredProducts = featuredProductsMap.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
                 .limit(10)
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
 
+        return featuredProducts.stream()
+                .map(product -> FeaturedProductsResponse.builder()
+                        .productId(product.getProductId())
+                        .sku(product.getSku())
+                        .productName(product.getProductName())
+                        .description(product.getDescription())
+                        .unitPrice(product.getUnitPrice())
+                        .stockQuantity(product.getStockQuantity())
+                        .image(product.getImage())
+                        .categoryName(product.getCategory().getCategoryName())
+                        .createdAt(product.getCreatedAt())
+                        .updateAt(product.getUpdateAt())
+                        .wishlistNumber(featuredProductsMap.get(product).intValue())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Product> getBestSellerProductsFromAndTo(RevenueRequest revenueRequest) {
+    public List<Product> getBestSellerProductsFromAndTo(RevenueRequest revenueRequest) throws CustomException {
+        Date fromDate = revenueRequest.getFrom();
+        Date toDate = revenueRequest.getTo();
+        if (fromDate.after(toDate)) {
+            throw new CustomException("Invalid date range: 'from' date must be before 'to' date.", HttpStatus.BAD_REQUEST);
+        }
         //lay order theo khoang thoi gian
-        List<Order> orders = orderRepository.findAllByCreatedAtBetween(revenueRequest.getFrom(), revenueRequest.getTo());
+        List<Order> orders = orderRepository.findAllByCreatedAtBetween(fromDate, toDate)
+                .stream()
+                .filter(order -> order.getOrderStatus().equals(OrderStatus.SUCCESS))
+                .toList();
 
         if (orders.isEmpty()) {
-            throw new NoSuchElementException("No orders found within the specified time range");
+            throw new CustomException("No orders found within the specified time range", HttpStatus.NOT_FOUND);
         } else {
             //lay ra danh sach Order Detail cua Order
             List<OrderDetail> orderDetails = orders.stream()

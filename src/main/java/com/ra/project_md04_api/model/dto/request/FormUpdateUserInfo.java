@@ -34,7 +34,7 @@ public class FormUpdateUserInfo {
 
     @NotBlank(message = "Phone must be not blank")
     @Pattern(regexp = "^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$", message = "Invalid phone format!")
-    @Max(value = 15,message = "Max characters is 15")
+    @Size(max = 15,message = "Max characters is 15")
     @PhoneExist
     private String phone;
 

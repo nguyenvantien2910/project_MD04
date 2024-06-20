@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface IOrderRepository extends JpaRepository<Order, Long> {
-    @Query("select o from Order o where o.user.userId =: userId")
+    @Query("select o from Order o where o.user.userId =:userId")
     List<Order> findAllByUserUserId(Long userId);
 
     @Query("select o from  Order o where o.serialNumber =:serialNumber")
@@ -20,4 +20,6 @@ public interface IOrderRepository extends JpaRepository<Order, Long> {
 
     @Query("select o from Order o where o.createdAt between :from and :to")
     List<Order> findAllByCreatedAtBetween(Date from, Date to);
+
+    List<Order> findAllByUserUserIdAndOrderStatus(Long userId, OrderStatus orderStatus);
 }

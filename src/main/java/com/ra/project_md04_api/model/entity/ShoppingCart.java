@@ -31,5 +31,4 @@ public class ShoppingCart implements Serializable {
     @Column(name = "order_quantity")
     @Min(value = 1,message = "Order quantity must than 0 !")
     private Integer orderQuantity;
-
 }

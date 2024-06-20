@@ -21,7 +21,7 @@ public class JWTProvider {
                 .setSubject(customUserDetail.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + EXPIRED_ACCESS))
-                .signWith(SignatureAlgorithm.ES512, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 .compact();
     }
 

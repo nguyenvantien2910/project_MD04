@@ -2,6 +2,7 @@ package com.ra.project_md04_api.controller.admin;
 
 
 import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.exception.CustomException;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
 import com.ra.project_md04_api.service.IOrderService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class OrderController {
     private final IOrderService orderService;
 
     @GetMapping
-    public ResponseEntity<?> findAll() {
+    public ResponseEntity<?> findAll() throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -26,19 +27,19 @@ public class OrderController {
                 , HttpStatus.OK);
     }
 
-    @GetMapping("/{orderStatus}")
-    public ResponseEntity<?> findAllOrdersByStatus(@PathVariable("orderStatus") String orderStatus) {
+    @GetMapping("/status/{orderStatus}")
+    public ResponseEntity<?> findAllOrdersByStatus(@PathVariable("orderStatus") String orderStatus) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
                         .statusCode(HttpStatus.OK.value())
-                        .data(orderService.getALlOrdersByStatus(orderStatus))
+                        .data(orderService.adminGetALlOrdersByStatus(orderStatus))
                         .build()
                 , HttpStatus.OK);
     }
 
     @GetMapping("/{orderId}")
-    public ResponseEntity<?> findOrderById(@PathVariable("orderId") Long orderId) {
+    public ResponseEntity<?> findOrderById(@PathVariable("orderId") Long orderId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -48,8 +49,8 @@ public class OrderController {
                 , HttpStatus.OK);
     }
 
-    @PutMapping("/{orderId}/status")
-    public ResponseEntity<?> updateOrderStatus(@RequestBody String orderStatus, @PathVariable("orderId") Long orderId) {
+    @PutMapping("/change-status/{orderId}")
+    public ResponseEntity<?> updateOrderStatus(@RequestParam String orderStatus, @PathVariable("orderId") Long orderId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)

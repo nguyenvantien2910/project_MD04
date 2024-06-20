@@ -35,7 +35,7 @@ public class CustomUserDetailService implements UserDetailsService {
                     .createdAt(user.getCreatedAt())
                     .updatedAt(user.getUpdatedAt())
                     .status(user.getStatus())
-                    .authorities(user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName().name())).toList())
+                    .authorities(user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName().name())).toList())
                     .build();
         }
         throw new UsernameNotFoundException("User not found");

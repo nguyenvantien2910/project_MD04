@@ -1,9 +1,12 @@
 package com.ra.project_md04_api.controller.user;
 
 import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.exception.CustomException;
+import com.ra.project_md04_api.model.dto.request.FormAddAddress;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
 import com.ra.project_md04_api.model.entity.Address;
 import com.ra.project_md04_api.service.IAddressService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +20,18 @@ public class UserAddressController {
     private final IAddressService addressService;
 
     @GetMapping
-    public ResponseEntity<?> getAllAddressesByUserId(@RequestBody Long userId) {
+    public ResponseEntity<?> getAllAddressesByUserId() throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
                         .statusCode(HttpStatus.OK.value())
-                        .data(addressService.getAllAddressByUserId(userId))
+                        .data(addressService.getAllAddressByUserId())
                         .build()
                 , HttpStatus.OK);
     }
 
     @GetMapping("/{addressId}")
-    public ResponseEntity<?> getAddressById(@PathVariable Long addressId) {
+    public ResponseEntity<?> getAddressById(@PathVariable Long addressId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -39,7 +42,7 @@ public class UserAddressController {
     }
 
     @DeleteMapping("/{addressId}")
-    public ResponseEntity<?> deleteAddressById(@PathVariable Long addressId) {
+    public ResponseEntity<?> deleteAddressById(@PathVariable Long addressId) throws CustomException {
         addressService.deleteAddress(addressId);
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
@@ -51,12 +54,12 @@ public class UserAddressController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addNewAddress(@RequestBody Address newAddress) {
+    public ResponseEntity<?> addNewAddress(@Valid @RequestBody FormAddAddress formAddAddress) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
                         .statusCode(HttpStatus.OK.value())
-                        .data(addressService.addAddress(newAddress))
+                        .data(addressService.addAddress(formAddAddress))
                         .build()
                 , HttpStatus.OK);
     }

@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidUsername {
-    String message() default "Invalid username!";
+    String message() default "Username already exists or contains special characters";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

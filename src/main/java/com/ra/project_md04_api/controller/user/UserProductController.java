@@ -1,6 +1,7 @@
 package com.ra.project_md04_api.controller.user;
 
 import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.exception.CustomException;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
 import com.ra.project_md04_api.service.IProductService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ public class UserProductController {
     private final IProductService productService;
 
     @GetMapping("/new-products")
-    public ResponseEntity<?> getNewProducts() {
+    public ResponseEntity<?> getNewProducts() throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -28,7 +29,7 @@ public class UserProductController {
     }
 
     @GetMapping("/best-seller-products")
-    public ResponseEntity<?> getBestSellerProducts() {
+    public ResponseEntity<?> getBestSellerProducts() throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -39,7 +40,7 @@ public class UserProductController {
     }
 
     @GetMapping("/featured-products")
-    public ResponseEntity<?> getFeaturedProducts() {
+    public ResponseEntity<?> getFeaturedProducts() throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)

@@ -1,9 +1,9 @@
 package com.ra.project_md04_api.controller.user;
 
 import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.exception.CustomException;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
 import com.ra.project_md04_api.service.IOrderService;
-import com.ra.project_md04_api.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,21 +14,20 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserOrderController {
     private final IOrderService orderService;
-    private final IUserService userService;
 
     @GetMapping
-    public ResponseEntity<?> getAllUserOrders() {
+    public ResponseEntity<?> getAllUserOrders() throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
                         .statusCode(HttpStatus.OK.value())
-                        .data(orderService.getALlOrdersByUserId(userService.getCurrentUserId()))
+                        .data(orderService.getALlOrdersByUserId())
                         .build()
                 , HttpStatus.OK);
     }
 
-    @GetMapping("/{orderStatus}")
-    public ResponseEntity<?> getUserOrderStatus(@PathVariable("orderStatus") String orderStatus) {
+    @GetMapping("/status/{orderStatus}")
+    public ResponseEntity<?> getUserOrderStatus(@PathVariable("orderStatus") String orderStatus) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -39,7 +38,7 @@ public class UserOrderController {
     }
 
     @PostMapping("/{orderId}/cancel")
-    public ResponseEntity<?> cancelOrder(@PathVariable("orderId") Long orderId) {
+    public ResponseEntity<?> cancelOrder(@PathVariable("orderId") Long orderId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -49,8 +48,8 @@ public class UserOrderController {
                 , HttpStatus.OK);
     }
 
-    @GetMapping("/{serialNumber}")
-    public ResponseEntity<?> getUserOrderBySerialNumber(@PathVariable("serialNumber") String serialNumber) {
+    @GetMapping("/serial/{serialNumber}")
+    public ResponseEntity<?> getUserOrderBySerialNumber(@PathVariable("serialNumber") String serialNumber) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)

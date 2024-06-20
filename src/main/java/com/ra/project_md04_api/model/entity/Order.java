@@ -2,7 +2,6 @@ package com.ra.project_md04_api.model.entity;
 
 import com.ra.project_md04_api.constants.OrderStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,8 +21,8 @@ public class Order {
     @Column(name = "order_id", unique = true, nullable = false)
     private Long orderId;
 
-    @Column(nullable = false, length = 100)
-    @Max(value = 100, message = "Max lenght of serial number is 100 characters!")
+    @Column(nullable = false,length = 100)
+    @Size(max = 100, message = "Max lenght of serial number is 100 characters!")
     private String serialNumber;
 
     @ManyToOne

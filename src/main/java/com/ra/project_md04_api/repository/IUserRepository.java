@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface IUserRepository extends JpaRepository<User, Long> {
-    Boolean existsByPhone(String phone);
+    boolean existsByPhone(String phone);
 
-    Boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
     @Query("select u from User u where u.username = :userName")
     Optional<User> findUserByUsername(String userName);

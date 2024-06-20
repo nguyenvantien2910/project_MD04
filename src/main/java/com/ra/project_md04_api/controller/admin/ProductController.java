@@ -1,6 +1,7 @@
 package com.ra.project_md04_api.controller.admin;
 
 import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.exception.CustomException;
 import com.ra.project_md04_api.model.dto.request.FormAddProduct;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
 import com.ra.project_md04_api.service.IProductService;
@@ -17,7 +18,7 @@ public class ProductController {
     private final IProductService productService;
 
     @GetMapping
-    public ResponseEntity<?> getCategories(@RequestBody String searchName, Integer page, Integer perPage, String orderBy, String direction) {
+    public ResponseEntity<?> getProducts(@RequestParam String searchName, Integer page, Integer perPage, String orderBy, String direction) {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -28,7 +29,7 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<?> getProductById(@PathVariable Long productId) {
+    public ResponseEntity<?> getProductById(@PathVariable Long productId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -39,7 +40,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<?> insertProduct(@Valid @RequestBody FormAddProduct formAddProduct) {
+    public ResponseEntity<?> insertProduct(@Valid @RequestBody FormAddProduct formAddProduct) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -50,7 +51,7 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(@Valid @RequestBody FormAddProduct formAddProduct, @PathVariable Long productId) {
+    public ResponseEntity<?> updateProduct(@Valid @RequestBody FormAddProduct formAddProduct, @PathVariable Long productId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -61,7 +62,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long productId) {
+    public ResponseEntity<?> deleteProduct(@PathVariable Long productId) throws CustomException {
         productService.deleteProduct(productId);
         return new ResponseEntity<>(
                 ResponseWrapper.builder()

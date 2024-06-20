@@ -1,11 +1,7 @@
 package com.ra.project_md04_api.model.dto.request;
 
 import com.ra.project_md04_api.validator.ProductNameExist;
-import com.ra.project_md04_api.validator.SkuExist;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,22 +13,23 @@ import lombok.NoArgsConstructor;
 @Builder
 public class FormAddProduct {
 
-    @Max(value = 100, message = "Max lenght of product name is 100 characters!")
+    @NotBlank(message = "Product name must be not blank")
+    @Size(max = 100, message = "Max length of product name is 100 characters!")
     @ProductNameExist
     private String productName;
 
     private String description;
 
-    @NotBlank(message = "UnitPrice must be not blank")
+    @NotNull(message = "UnitPrice must be not null")
     private Double unitPrice;
 
-    @NotBlank(message = "New password must be not blank")
+    @NotNull(message = "New password must be not null")
     @Min(value = 0, message = "Quantity must be greater than 0 !")
     private Integer stockQuantity;
 
     private String image;
 
-    @NotEmpty(message = "New password must be not empty")
+    @NotNull(message = "New password must be not null")
     private Long categoryId;
 
 }

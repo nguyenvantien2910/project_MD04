@@ -1,8 +1,11 @@
 package com.ra.project_md04_api.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -20,7 +23,7 @@ public class Category {
     private Long categoryId;
 
     @Column(nullable = false)
-    @Max(value = 100,message = "Max lenght of category name is 100 characters")
+    @Size(max = 100,message = "Max lenght of category name is 100 characters")
     private String categoryName;
 
     private String description;
@@ -28,5 +31,6 @@ public class Category {
     private Boolean status;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Product> products;
 }

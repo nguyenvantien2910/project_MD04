@@ -5,6 +5,7 @@ import com.ra.project_md04_api.validator.SkuExist;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -24,13 +25,13 @@ public class Product {
     private Long productId;
 
     @Column(unique = true)
-    @Max(value = 100,message = "Max lenght of sku is 100 characters!")
-    @SkuExist
+    @Size(max = 100,message = "Max lenght of sku is 100 characters!")
+   // @SkuExist
     private String sku;
 
     @Column(unique = true)
-    @Max(value = 100,message = "Max lenght of product name is 100 characters!")
-    @ProductNameExist
+    @Size(max = 100,message = "Max lenght of product name is 100 characters!")
+//    @ProductNameExist
     private String productName;
 
     private String description;

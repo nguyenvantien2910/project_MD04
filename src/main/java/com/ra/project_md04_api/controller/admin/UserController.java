@@ -1,16 +1,13 @@
 package com.ra.project_md04_api.controller.admin;
 
 import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.exception.CustomException;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
-import com.ra.project_md04_api.model.entity.User;
 import com.ra.project_md04_api.service.IUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api.myservice.com/v1/admin/users")
@@ -19,7 +16,7 @@ public class UserController {
     private final IUserService userService;
 
     @GetMapping
-    public ResponseEntity<?> getUsers(@RequestBody String searchName, Integer page, Integer perPage, String orderBy, String direction) {
+    public ResponseEntity<?> getUsers(@RequestParam String searchName, Integer page, Integer perPage, String orderBy, String direction) {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -41,7 +38,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}/role/{roleId}")
-    public ResponseEntity<?> deleteUserRole(@PathVariable Long userId, @PathVariable Long roleId) {
+    public ResponseEntity<?> deleteUserRole(@PathVariable Long userId, @PathVariable Long roleId) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -52,18 +49,19 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<?> updateUserStatus(@PathVariable Long userId) {
+    public ResponseEntity<?> updateUserStatus(@PathVariable Long userId) throws CustomException {
+        userService.updateUserStatus(userId);
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
                         .statusCode(HttpStatus.OK.value())
-                        .data(userService.updateUserStatus(userId))
+                        .data("Change user status successfully")
                         .build()
                 , HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchUserByFullName(@RequestBody String searchName) {
+    public ResponseEntity<?> searchUserByFullName(@RequestParam String searchName) {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)

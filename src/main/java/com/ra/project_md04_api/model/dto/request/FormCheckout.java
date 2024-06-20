@@ -30,5 +30,5 @@ public class FormCheckout {
     private String receivePhone;
 
     @NotNull(message = "Shopping cart item must be not null!")
-    List<ShoppingCart> shoppingCarts;
+    List<Long> shoppingCartItems;
 }

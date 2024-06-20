@@ -8,5 +8,5 @@ import com.ra.project_md04_api.model.dto.response.JwtResponse;
 public interface IAuthService {
     JwtResponse handleLogin(FormLogin formLogin) throws CustomException;
 
-    void handleRegister(FormRegister formRegister);
+    void handleRegister(FormRegister formRegister) throws CustomException;
 }

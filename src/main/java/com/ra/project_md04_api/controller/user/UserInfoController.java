@@ -1,6 +1,7 @@
 package com.ra.project_md04_api.controller.user;
 
 import com.ra.project_md04_api.constants.EHttpStatus;
+import com.ra.project_md04_api.exception.CustomException;
 import com.ra.project_md04_api.model.dto.request.FormUpdateUserInfo;
 import com.ra.project_md04_api.model.dto.request.FormChangePassword;
 import com.ra.project_md04_api.model.dto.response.ResponseWrapper;
@@ -18,7 +19,7 @@ public class UserInfoController {
     private final IUserService userService;
 
     @GetMapping
-    public ResponseEntity<?> getUserInfo() {
+    public ResponseEntity<?> getUserInfo() throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -29,7 +30,7 @@ public class UserInfoController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateUserInfo(@Valid @RequestBody FormUpdateUserInfo formUpdateUserInfo) {
+    public ResponseEntity<?> updateUserInfo(@Valid @RequestBody FormUpdateUserInfo formUpdateUserInfo) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)
@@ -40,7 +41,7 @@ public class UserInfoController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody FormChangePassword formChangePassword) {
+    public ResponseEntity<?> changePassword(@Valid @RequestBody FormChangePassword formChangePassword) throws CustomException {
         return new ResponseEntity<>(
                 ResponseWrapper.builder()
                         .eHttpStatus(EHttpStatus.SUCCESS)

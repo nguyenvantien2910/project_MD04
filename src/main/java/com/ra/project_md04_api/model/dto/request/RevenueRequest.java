@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -16,9 +17,12 @@ import java.util.Date;
 public class RevenueRequest {
     @NotNull(message = "From date cannot be null")
     @Past(message = "From date must be in the past")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+
     private Date from;
 
     @NotNull(message = "To date cannot be null")
     @Past(message = "To date must be in the past")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date to;
 }

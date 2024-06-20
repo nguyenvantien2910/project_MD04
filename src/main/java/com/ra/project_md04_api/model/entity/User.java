@@ -25,7 +25,7 @@ public class User {
     private Long userId;
 
     @Column(unique = true, nullable = false, length = 100)
-    @Size(min = 6, max = 100, message = "Username must be between 6 and 100 characters!")
+    @Size(min = 4, max = 100, message = "Username must be between 6 and 100 characters!")
     @ValidUsername
     private String username;
 

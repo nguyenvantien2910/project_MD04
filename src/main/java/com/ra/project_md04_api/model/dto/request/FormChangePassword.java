@@ -16,7 +16,7 @@ public class FormChangePassword {
     private String oldPassword;
 
     @NotBlank(message = "New password must be not blank")
-    @ConfirmPasswordMatching(password = "newPassword", confirmPassword = "confirmNewPassword")
+//    @ConfirmPasswordMatching(password = "newPassword", confirmPassword = "confirmNewPassword")
     private String newPassword;
 
     @NotBlank(message = "Confirm password must be not blank")

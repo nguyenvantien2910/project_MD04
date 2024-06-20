@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface IRoleRepository extends JpaRepository<Role, Long> {
-    @Query("select r from Role r where r.name =: roleName")
-    Optional<Role> findByName(RoleName roleName);
+//    @Query("select r from Role r where r.name =: roleName")
+    Optional<Role> findByRoleName(RoleName roleName);
 }

@@ -47,6 +47,9 @@ public class IAuthenServiceImpl implements IAuthService {
             throw new CustomException("Invalid email or password", HttpStatus.CONFLICT);
         }
         CustomUserDetail customUserDetail = (CustomUserDetail) authentication.getPrincipal();
+        if (!customUserDetail.getStatus()) {
+            throw new CustomException("User is blocked", HttpStatus.FORBIDDEN);
+        }
 
         String accessToken = jwtProvider.getAccessToken(customUserDetail);
 
@@ -66,24 +69,32 @@ public class IAuthenServiceImpl implements IAuthService {
     }
 
     @Override
-    public void handleRegister(FormRegister formRegister) {
+    public void handleRegister(FormRegister formRegister) throws CustomException {
         List<Role> roles = new ArrayList<>();
 
         if (formRegister.getRoles() == null || formRegister.getRoles().isEmpty()) {
             roles.add(roleService.findRoleByName(RoleName.ROLE_USER));
         } else {
-            formRegister.getRoles().forEach(role -> {
+            for (String role : formRegister.getRoles()) {
                 switch (role) {
                     case "ROLE_ADMIN":
-                        roles.add(roleService.findRoleByName(RoleName.ROLE_ADMIN));
+                        try {
+                            roles.add(roleService.findRoleByName(RoleName.ROLE_ADMIN));
+                        } catch (CustomException e) {
+                            throw new CustomException(e.getMessage(), HttpStatus.CONFLICT);
+                        }
                         break;
                     case "ROLE_USER":
-                        roles.add(roleService.findRoleByName(RoleName.ROLE_USER));
+                        try {
+                            roles.add(roleService.findRoleByName(RoleName.ROLE_USER));
+                        } catch (CustomException e) {
+                            throw new CustomException(e.getMessage(), HttpStatus.CONFLICT);
+                        }
                         break;
                     default:
-                        throw new RuntimeException("Invalid role" + role);
+                        throw new CustomException("Invalid role" + role, HttpStatus.CONFLICT);
                 }
-            });
+            }
         }
 
         //chuyen FormRegister ve User de save vao database

@@ -7,17 +7,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Date;
 import java.util.List;
 
 public interface IProductRepository extends JpaRepository<Product, Long> {
-    Boolean existsBySku(String sku);
-    Boolean existsByProductName(String productName);
+    boolean existsBySku(String sku);
+    boolean existsByProductName(String productName);
 
     @Query("select p from Product p where p.productName like concat('%',:productName,'%')")
     Page<Product> findProductByProductNameAndSorting(String productName, Pageable pageable);
 
     @Query("select p from Product p where p.productName like concat('%',:keyword,'%') or p.description like concat('%',:keyword,'%')")
+//    @Query("select p from Product p where (p.productName like %:keyword%) or (p.description like %:keyword%)")
     List<Product> findProductByProductNameAndDescription(String keyword);
 
     @Query("select p from Product p where p.category.categoryId = :categoryId")
